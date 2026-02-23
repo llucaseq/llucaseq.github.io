@@ -1,0 +1,1533 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>答案之书</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&amp;family=Noto+Serif+SC:wght@300;400;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0a0a0f;
+            --bg-card: #12121a;
+            --gold: #c9a227;
+            --gold-light: #e8d48b;
+            --gold-dim: #8b7355;
+            --page: #f5f0e1;
+            --page-shadow: #d4cbb8;
+            --text-dark: #2a2520;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Serif SC', 'Crimson Pro', serif;
+            background: var(--bg-deep);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 背景星空效果 */
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.2); }
+        }
+
+        /* 浮动光晕 */
+        .glow-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #1a3a4a, transparent);
+            top: -100px;
+            left: -100px;
+            animation: float1 20s ease-in-out infinite;
+        }
+
+        .glow-2 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, #2a1a3a, transparent);
+            bottom: -50px;
+            right: -50px;
+            animation: float2 25s ease-in-out infinite;
+        }
+
+        .glow-3 {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(201, 162, 39, 0.15), transparent);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes float1 {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(100px, 80px); }
+        }
+
+        @keyframes float2 {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-80px, -60px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.2; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.4; transform: translate(-50%, -50%) scale(1.5); }
+        }
+
+        /* 主容器 */
+        .main-container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        /* 书籍容器 */
+        .book-wrapper {
+            perspective: 2000px;
+            margin-bottom: 40px;
+        }
+
+        .book {
+            position: relative;
+            width: 320px;
+            height: 420px;
+            transform-style: preserve-3d;
+        }
+
+        /* 书脊 */
+        .book-spine {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 30px;
+            height: 100%;
+            background: linear-gradient(90deg, #1a1510, #2a2015, #1a1510);
+            transform: rotateY(-90deg) translateX(-15px);
+            transform-origin: left;
+            border-radius: 2px 0 0 2px;
+        }
+
+        /* 封底 */
+        .book-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1510 0%, #2a2015 50%, #1a1510 100%);
+            border-radius: 4px;
+            box-shadow: 
+                inset 0 0 60px rgba(0,0,0,0.5),
+                0 20px 60px rgba(0,0,0,0.8);
+            transform: translateZ(-15px);
+        }
+
+        /* 封面 */
+        .book-cover {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://p26-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/f2439799033c4187bb0fe4f9ace21cba.png~tplv-a9rns2rl98-24:720:720.png?lk3s=8e244e95&rcl=20260223191254339CA53B831E4E71B8AD&rrcfp=8a172a1a&x-expires=1772449975&x-signature=nkavJdcho3KNzuByjZIelAfwaOQ%3D');
+            background-size: cover;
+            background-position: center;
+            border-radius: 4px;
+            transform-origin: left;
+            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+            box-shadow: 
+                inset 0 0 80px rgba(0,0,0,0.4),
+                5px 5px 20px rgba(0,0,0,0.5);
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .book-cover.open {
+            transform: rotateY(-160deg);
+        }
+
+        /* 内页 */
+        .book-page {
+            position: absolute;
+            width: calc(100% - 10px);
+            height: calc(100% - 20px);
+            left: 10px;
+            top: 10px;
+            background: linear-gradient(135deg, var(--page) 0%, var(--page-shadow) 100%);
+            border-radius: 2px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 30px;
+            box-shadow: 
+                inset 0 0 40px rgba(0,0,0,0.05),
+                -5px 0 15px rgba(0,0,0,0.1);
+            background-image: 
+                linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            position: relative;
+        }
+
+        .book-page::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, rgba(128, 90, 40, 0.2), transparent);
+        }
+
+        .book-page::after {
+            content: '?';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            color: rgba(128, 90, 40, 0.3);
+            font-family: serif;
+        }
+
+        .page-texture {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+        }
+
+        /* 答案显示区域 */
+        .answer-display {
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .answer-display.visible {
+            opacity: 1;
+        }
+
+        .answer-text {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin-bottom: 30px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .answer-number {
+            font-family: 'Crimson Pro', serif;
+            font-size: 14px;
+            color: #8b7355;
+            letter-spacing: 2px;
+        }
+
+        .page-decoration {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .page-decoration span {
+            width: 4px;
+            height: 4px;
+            background: var(--gold-dim);
+            border-radius: 50%;
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 12px;
+            color: rgba(128, 90, 40, 0.4);
+            font-family: serif;
+        }
+
+        /* 输入区域 */
+        .input-section {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .question-input {
+            width: 100%;
+            padding: 18px 24px;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(201, 162, 39, 0.2);
+            border-radius: 8px;
+            color: #e8e0d0;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .question-input::placeholder {
+            color: rgba(232, 224, 208, 0.4);
+        }
+
+        .question-input:focus {
+            border-color: var(--gold);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 30px rgba(201, 162, 39, 0.1);
+        }
+
+        .seek-button {
+            position: relative;
+            padding: 16px 48px;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--bg-deep);
+            background: linear-gradient(135deg, var(--gold-light), var(--gold));
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .seek-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(201, 162, 39, 0.3);
+        }
+
+        .seek-button:active {
+            transform: translateY(0);
+        }
+
+        .seek-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .seek-button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transform: rotate(45deg) translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .seek-button:hover::after {
+            transform: rotate(45deg) translateX(100%);
+        }
+
+        /* 提示文字 */
+        .hint-text {
+            font-size: 13px;
+            color: rgba(232, 224, 208, 0.4);
+            letter-spacing: 1px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* 动画状态 */
+        .thinking .answer-text {
+            animation: thinkingPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes thinkingPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* 书本打开时的浮动动画 */
+        .book.opened {
+            animation: bookFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes bookFloat {
+            0%, 100% { transform: translateY(0) rotateX(5deg); }
+            50% { transform: translateY(-10px) rotateX(5deg); }
+        }
+
+        /* 魔法粒子 */
+        .magic-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 50%;
+            opacity: 0;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(201, 162, 39, 0.8);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(20px);
+                opacity: 0;
+            }
+        }
+
+        /* 响应式 */
+        @media (max-width: 480px) {
+            .book {
+                width: 280px;
+                height: 380px;
+            }
+
+            .answer-text {
+                font-size: 22px;
+            }
+
+            .question-input {
+                font-size: 15px;
+                padding: 15px 20px;
+            }
+        }
+
+        /* 减少动画 */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景效果 -->
+    <div class="stars-container" id="stars"></div>
+    <div class="glow-orb glow-1"></div>
+    <div class="glow-orb glow-2"></div>
+    <div class="glow-orb glow-3"></div>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- 书籍 -->
+        <div class="book-wrapper">
+            <div class="book" id="book">
+                <div class="magic-particles" id="magic-particles"></div>
+                <div class="book-back"></div>
+                <div class="book-spine"></div>
+                <div class="book-cover" id="bookCover"></div>
+                <div class="book-page">
+                    <div class="page-texture"></div>
+                    <div class="answer-display" id="answerDisplay">
+                        <div class="answer-text" id="answerText">在心中默念你的问题</div>
+                        <div class="answer-number" id="answerNumber">第 0 页</div>
+                    </div>
+                    <div class="page-decoration">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div class="page-number" id="page-number"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 输入区域 -->
+        <div class="input-section">
+            <input type="text" class="question-input" id="questionInput" placeholder="在此写下你的问题..." maxlength="100" autocomplete="off">
+            <button class="seek-button" id="seekButton">翻开答案</button>
+            <p class="hint-text">
+</p>
+        </div>
+    </div>
+
+    <script>
+        // 爱情关键词库
+        const loveKeywords = [
+            '爱', '喜欢', '喜不喜欢', '爱不爱', '喜欢我', '喜欢他', '喜欢她', '喜欢你', '我喜欢',
+            '爱我', '爱他', '爱她', '爱你', '我爱', '爱意', '爱情', '爱人', '爱恋', '爱慕', '爱侣',
+            '相爱', '深爱', '挚爱', '珍爱', '疼爱', '宠爱', '偏爱', '独爱', '唯爱', '最爱', '恩爱',
+            '恋爱', '表白', '告白', '复合', '分手', '对象', '男友', '男朋友', '女友', '女朋友',
+            '伴侣', '老公', '老婆', '丈夫', '妻子', '婚姻', '结婚', '暗恋', '暧昧', '前任', '现任',
+            '感情', '情侣', '求婚', '订婚', '脱单', '桃花', '缘分', '心动', '好感', '双向奔赴',
+            '婚礼', '婚房', '彩礼', '嫁妆', '婆媳', '领证', '复婚', '二婚', '闪婚', '闪离', '分居',
+            '离婚', '备孕', '怀孕', '生子', '见家长', '提亲', '定亲', '回门', '蜜月', '婚期', '婚宴',
+            '婚纱', '钻戒', '对戒', '婚前协议', '婚内协议', '忠诚协议', '离婚协议', '抚养权', '抚养费',
+            'crush', '冷战', '吵架', '和好', '挽回', '挽留', '断联', '拉黑', '删除', '约会', '见面',
+            '牵手', '拥抱', '接吻', '同居', '异地恋', '网恋', '奔现', '相亲', '单恋', '单相思', '双向暗恋',
+            '官宣', '秀恩爱', '单身', '找对象', '介绍对象', '青梅竹马', '一见钟情', '日久生情', '破镜重圆',
+            '意难平', '白月光', '朱砂痣', '前男友', '前女友', '前夫', '前妻', '前未婚夫', '前未婚妻',
+            '安全感', '仪式感', '例外', '专属', '唯一', '契合', '灵魂伴侣', '三观', '磨合', '包容',
+            '理解', '信任', '忠诚', '坦诚', '欺骗', '谎言', '承诺', '誓言', '约定', '未来规划', '家庭',
+            '父母反对', '异地', '跨国恋', '军恋', '姐弟恋', '兄妹恋', '师生恋', '忘年恋', '同性恋', '出柜',
+            '形婚', '丁克', '丧偶', '单亲', '孽缘', '正缘', '烂桃花', '姻缘', '情缘', '月老', '红娘',
+            '纪念日', '生日', '礼物', '惊喜', '浪漫', '温柔', '体贴', '直男', '直女', '妈宝男', '扶弟魔',
+            '凤凰男', '孔雀女', '三观不合', '门当户对', '家务', '做饭', '带娃', '出轨', '劈腿', '绿帽',
+            '小三', '渣男', '渣女', '海王', '海后', '舔狗', '备胎', '养鱼', '鱼塘', 'PUA', 'pua',
+            '道歉', '认错', '原谅', '放下', '执念', '告别', '重逢', '偶遇', '邂逅', '陪伴', '哄', '宠',
+            '吃醋', '真心', '新鲜感', '上头', '下头', '固聊', '搭子', '饭搭子', '旅游搭子', '床搭子',
+            'ONS', '一夜情', '约炮', '炮友', '第一次', '初吻', '初恋', '热恋', '失恋', '苦恋', '痴恋',
+            '相爱相杀', '和平分手', '体面', '各自安好', '一别两宽', '相濡以沫', '相敬如宾', '举案齐眉',
+            '白头偕老', '相守', '一辈子', '余生', '我们', '在一起', '私奔', '明恋',
+            '占有欲', '控制欲', '边界感', '分寸感', '亲密', '亲密关系', '两性', '夫妻生活',
+            '性生活', '初夜', '贞操', '忠诚', '出轨', '家暴', '冷暴力', '精神出轨', '肉体出轨',
+            '挽回', '复合', '破冰', '和好', '道歉', '认错', '悔改', '原谅', '宽恕', '放下', '执念'
+        ];
+
+        // 爱情专属正面答案库
+        const loveAnswers = [
+            '是双向的奔赴，大胆去爱吧',
+            '你们的缘分远比你想象的更深',
+            '他的心意和你一样真诚',
+            '这段感情会有你期待的美好结局',
+            '勇敢表达，爱意会得到圆满的回应',
+            '你们会拥有长久且温柔的未来',
+            '复合的时机已经成熟，别错过彼此',
+            '他一直在偷偷关注着你',
+            '你的真心终会换来对等的爱意',
+            '这段感情值得你全力以赴',
+            '你们的故事才刚刚开始，未来满是惊喜',
+            '别犹豫，他就是对的人',
+            '误会终会解开，爱意只会更浓',
+            '你的暗恋终会迎来双向的圆满',
+            '这段婚姻会给你带来长久的幸福',
+            '你们的感情会跨过所有阻碍，愈发稳固',
+            '他正在计划给你一个专属的惊喜',
+            '主动一步，你们就会有新的故事',
+            '你们的默契无人能及，注定相守',
+            '他比你想象中更在乎你',
+            '这段暧昧终会开花结果',
+            '你们的重逢是命中注定的圆满',
+            '你的温柔值得被他捧在手心',
+            '再坚持一下，幸福就在眼前',
+            '你们的爱情会被时光温柔以待',
+            '他想和你有很长很长的未来',
+            '所有的等待都会换来最好的结果',
+            '你们的相遇，本就是一场温柔的奇迹',
+            '大胆去拥抱属于你的爱情吧',
+            '他的偏爱只给你一人',
+            '你们会成为彼此生命里最亮的光',
+            '爱意随风起，风止意难平，你们终会相守',
+            '他正在朝你走来，带着满心的欢喜',
+            '这段感情没有错付，你值得被爱',
+            '你们的未来会有无数个浪漫的瞬间',
+            '他的心里，你永远是第一位',
+            '别害怕，他会一直陪着你',
+            '你们的爱情，会抵过岁月漫长',
+            '真心换真心，你们会一直幸福下去',
+            '他会给你足够的安全感和仪式感',
+            '你们的缘分，是命中注定的',
+            '再勇敢一点，你们就会有圆满的结局',
+            '他正在偷偷为你们的未来努力',
+            '你的所有小情绪，他都懂',
+            '你们的爱情，会被所有人祝福',
+            '别错过那个满眼都是你的人',
+            '他会用一辈子来爱你',
+            '你们的感情，只会越来越好',
+            '所有的阻碍，都是你们爱情的试金石',
+            '他会把所有的温柔都给你',
+            '你们的故事，会有最完美的结局',
+            '别担心，他不会离开你',
+            '你的爱意，他都收到了，并且给了你双倍的回应',
+            '你们会一起走过岁岁年年',
+            '他正在规划和你的未来',
+            '这段感情，会给你带来满满的幸福',
+            '你们的双向奔赴，终会迎来花开',
+            '他比你想象中更爱你',
+            '别犹豫，去见你想见的人吧',
+            '你们的爱情，会跨越山海，终会相见',
+            '所有的误会，都会迎刃而解',
+            '他会给你一个家，一个充满爱的家',
+            '你的真心，终会被珍惜',
+            '你们的爱情，会像童话一样美好',
+            '他正在等你主动一步',
+            '别害怕，大胆去爱吧，你不会受伤',
+            '你们的感情，会越来越深',
+            '他会陪你走过所有的风风雨雨',
+            '你的出现，照亮了他的整个世界',
+            '你们的缘分，早就写好了结局，是圆满',
+            '别再内耗了，他值得你去爱',
+            '他会给你足够的偏爱和例外',
+            '你们的爱情，会经得起时间的考验',
+            '他正在偷偷喜欢你',
+            '别错过，这就是你命中注定的正缘',
+            '你们会一起看遍世间所有的风景',
+            '他会把你宠成小朋友',
+            '你的所有期待，都会一一实现',
+            '这段感情，会成为你这辈子最美好的回忆',
+            '他会永远站在你这边',
+            '你们的爱情，会越来越甜蜜',
+            '别担心，你们会一直在一起',
+            '你的爱意，从来都不是单箭头',
+            '你们会有一个浪漫的婚礼',
+            '他正在为你准备惊喜',
+            '别再犹豫了，去爱吧',
+            '你们的感情，会顺顺利利，长长久久',
+            '他会给你想要的未来',
+            '你的真心，终会换来他的全心全意',
+            '你们的相遇，是上天最好的安排',
+            '别害怕，你们的爱情会有完美的结局',
+            '他比你想象中更懂你',
+            '你们会一起慢慢变老',
+            '这段感情，值得你赌一次',
+            '他会永远爱你，忠诚于你',
+            '你们的爱意，会跨越时间和距离，愈发浓烈',
+            '他的未来里，一直都有你',
+            '别再试探了，他的心意和你一样坚定',
+            '你们会成为彼此最坚实的依靠',
+            '这段感情，会治愈你所有的不安',
+            '他会用行动告诉你，什么是被爱',
+            '你们的重逢，是久别重逢的圆满',
+            '别再等待了，主动一点，幸福就来了',
+            '你的温柔，是他这辈子最想守护的宝藏',
+            '你们的爱情，会在柴米油盐里开出花来',
+            '他会陪你从新鲜感走到归属感和安全感',
+            '别害怕，你们的爱能战胜一切',
+            '你的所有付出，都不会白费',
+            '他会把你规划进他的余生里',
+            '这段感情，会给你前所未有的幸福',
+            '你们的双向奔赴，终会抵过万水千山'
+        ];
+
+        // 通用答案库
+        const generalAnswers = [
+            '是',
+            '当然',
+            '毫无疑问',
+            '去做吧',
+            '会如你所愿',
+            '把握当下',
+            '值得一试',
+            '时机正好',
+            '会有惊喜',
+            '坚持就有结果',
+            '毋庸置疑',
+            '大胆去做',
+            '静待佳音',
+            '顺其自然',
+            '再等等',
+            '时机未到',
+            '随缘就好',
+            '来日方长',
+            '不好说',
+            '看你自己',
+            '世事难料',
+            '先放一放',
+            '静观其变',
+            '三思而后行',
+            '问问你自己',
+            '别想太多',
+            '答案在你心里',
+            '换个方向试试',
+            '无需多虑',
+            '跟随你的内心',
+            '主动一点',
+            '别错过机会',
+            '守住底线',
+            '活在当下',
+            '否',
+            '别抱希望',
+            '可能性不大',
+            '不要强求',
+            '得不偿失',
+            '放弃为好',
+            '时机不对',
+            '徒劳无功',
+            '别太较真',
+            '结果不尽人意',
+            '无需再等',
+            '会有贵人相助',
+            '保持初心即可',
+            '别被情绪左右',
+            '结果会超出预期',
+            '学会放下，反而会有收获',
+            '遵从你的第一直觉',
+            '不要犹豫',
+            '此事并无大碍',
+            '多听听身边人的建议',
+            '一切都会慢慢好起来',
+            '你需要先付出',
+            '别被他人的看法影响',
+            '你已经知道答案了',
+            '相信你自己的判断',
+            '别给自己留遗憾',
+            '再坚持一下',
+            '别钻牛角尖',
+            '会有转机',
+            '别急于求成',
+            '享受过程就好',
+            '你会得到你想要的',
+            '学会拒绝',
+            '别自寻烦恼',
+            '一切都是最好的安排',
+            '你需要更努力一点',
+            '别被利益冲昏头脑',
+            '保持冷静',
+            '会有意想不到的收获',
+            '别太固执',
+            '学会变通',
+            '你需要主动沟通',
+            '别杞人忧天',
+            '时机成熟，放手去做',
+            '别给自己太大压力',
+            '你会后悔的',
+            '别再拖延了',
+            '相信奇迹',
+            '别贪得无厌',
+            '知足常乐',
+            '你需要休息一下',
+            '别被表象迷惑',
+            '真相很快就会浮出水面',
+            '别轻易相信他人',
+            '你需要做好准备',
+            '会有意外发生',
+            '别轻举妄动',
+            '你会得到认可',
+            '别太在意得失',
+            '学会感恩',
+            '你需要做出改变',
+            '别固步自封',
+            '未来可期',
+            '别活在过去',
+            '珍惜当下',
+            '你需要学会放手',
+            '别被过去束缚',
+            '会有新的机会',
+            '别错过眼前的机会',
+            '你需要更勇敢一点',
+            '别害怕失败',
+            '失败是成功之母',
+            '你会从中成长',
+            '别放弃',
+            '坚持就是胜利',
+            '你需要给自己一点时间',
+            '别太急功近利',
+            '一步一步来',
+            '你会成功的',
+            '别被困难打倒',
+            '办法总比困难多',
+            '你需要寻求帮助',
+            '别独自硬扛',
+            '你不是一个人',
+            '会有人帮你的',
+            '别封闭自己',
+            '打开心扉，迎接新的可能',
+            '会有新的开始',
+            '结束也是新的开始',
+            '别害怕改变',
+            '改变会带来惊喜',
+            '你需要适应变化',
+            '别墨守成规',
+            '创新会给你带来收获',
+            '你需要跳出舒适圈',
+            '别安于现状',
+            '你值得更好的',
+            '别妄自菲薄',
+            '相信自己，你很棒',
+            '你有能力做到',
+            '别怀疑自己的能力',
+            '你很优秀',
+            '别和别人攀比',
+            '做你自己就好',
+            '你是独一无二的',
+            '别为了别人改变自己',
+            '爱自己是终身浪漫的开始',
+            '你需要好好爱自己',
+            '别亏待自己',
+            '对自己好一点',
+            '你需要给自己放个假',
+            '别太累了',
+            '身体是革命的本钱',
+            '健康最重要',
+            '别忽略自己的身体',
+            '你需要好好休息',
+            '别熬夜',
+            '规律作息会给你带来好运',
+            '你需要调整自己的状态',
+            '别被负面情绪影响',
+            '保持积极乐观的心态',
+            '爱笑的人运气不会太差',
+            '你需要多微笑',
+            '别愁眉苦脸',
+            '好运正在向你走来',
+            '你会迎来好运',
+            '别担心，一切都会好起来的',
+            '船到桥头自然直',
+            '车到山前必有路',
+            '别害怕未知',
+            '未知的世界充满惊喜',
+            '你需要勇敢一点',
+            '别退缩',
+            '向前走，别回头',
+            '过去的就让它过去吧',
+            '别耿耿于怀',
+            '放下过去，才能拥抱未来',
+            '你需要原谅自己',
+            '别和自己过不去',
+            '放过自己',
+            '你需要学会和自己和解',
+            '别太苛刻自己',
+            '接受自己的不完美',
+            '不完美才是人生',
+            '你需要接受现实',
+            '别逃避',
+            '面对现实，才能解决问题',
+            '你需要正视问题',
+            '别回避问题',
+            '问题总会解决的',
+            '别担心，天塌不下来',
+            '一切都会过去的',
+            '没有什么过不去的坎',
+            '你需要坚强一点',
+            '别脆弱',
+            '你比你想象中更强大',
+            '你有无限的可能',
+            '别给自己设限',
+            '你的潜力无限',
+            '你需要相信自己',
+            '别自卑',
+            '自信的人最有魅力',
+            '你需要提升自己',
+            '别停止学习',
+            '活到老，学到老',
+            '学习会给你带来更多机会',
+            '你需要多读书',
+            '书中自有黄金屋',
+            '别浪费时间',
+            '时间就是金钱',
+            '珍惜时间',
+            '你需要合理规划时间',
+            '别拖延',
+            '今日事今日毕',
+            '你需要提高效率',
+            '别做无用功',
+            '找准方向，事半功倍',
+            '你需要明确目标',
+            '别漫无目的',
+            '有目标才有动力',
+            '你需要制定计划',
+            '别盲目行动',
+            '计划周全，才能万无一失',
+            '你需要做好万全准备',
+            '别打无准备的仗',
+            '机会是留给有准备的人的',
+            '你需要抓住机会',
+            '别让机会溜走',
+            '机不可失，时不再来',
+            '你需要果断一点',
+            '别优柔寡断',
+            '当断不断，反受其乱',
+            '你需要做出选择',
+            '别犹豫不决',
+            '选择比努力更重要',
+            '你需要为自己的选择负责',
+            '别后悔自己的选择',
+            '自己选的路，跪着也要走完',
+            '你需要坚持自己的选择',
+            '别轻易放弃',
+            '半途而废，一事无成',
+            '你需要有耐心',
+            '别心急',
+            '心急吃不了热豆腐',
+            '耐心等待，会有好结果',
+            '你需要沉住气',
+            '别浮躁',
+            '静下心来，才能做好事',
+            '你需要专注',
+            '别三心二意',
+            '一心不可二用',
+            '专注才能成功',
+            '你需要一心一意',
+            '别分心',
+            '集中注意力，做好当下的事',
+            '你需要有责任心',
+            '别推卸责任',
+            '勇于承担，才能成长',
+            '你需要敢作敢当',
+            '别逃避责任',
+            '责任是成长的必修课',
+            '你需要有担当',
+            '别懦弱',
+            '勇敢面对，才能解决问题',
+            '你需要有勇气',
+            '别害怕犯错',
+            '犯错是成长的机会',
+            '知错能改，善莫大焉',
+            '你需要承认自己的错误',
+            '别死不认错',
+            '道歉不丢人',
+            '你需要学会道歉',
+            '别固执己见',
+            '虚心接受别人的建议',
+            '你需要谦虚一点',
+            '别骄傲自满',
+            '谦虚使人进步，骄傲使人落后',
+            '你需要低调一点',
+            '别张扬',
+            '枪打出头鸟',
+            '你需要谨言慎行',
+            '别祸从口出',
+            '言多必失',
+            '你需要少说话多做事',
+            '别光说不做',
+            '行动才是硬道理',
+            '你需要付诸行动',
+            '别空想',
+            '想再多不如做一次',
+            '你需要脚踏实地',
+            '别好高骛远',
+            '一步一个脚印，才能走得更远',
+            '你需要务实一点',
+            '别异想天开',
+            '现实一点，没坏处',
+            '你需要看清现实',
+            '别做白日梦',
+            '天上不会掉馅饼',
+            '你需要靠自己',
+            '别依赖别人',
+            '靠山山会倒，靠人人会跑',
+            '你需要独立',
+            '别依附别人',
+            '独立的人最有魅力',
+            '你需要有自己的主见',
+            '别人的建议仅供参考',
+            '别随波逐流',
+            '做自己的主人',
+            '你需要掌控自己的人生',
+            '别被别人左右',
+            '你的人生你做主',
+            '你需要为自己而活',
+            '别为别人而活',
+            '活出自己的精彩',
+            '你需要有自己的梦想',
+            '别没有追求',
+            '人没有梦想，和咸鱼有什么区别',
+            '你需要为梦想努力',
+            '别放弃梦想',
+            '梦想总会实现的',
+            '你需要坚持自己的梦想',
+            '别被现实打败',
+            '不忘初心，方得始终',
+            '你需要保持初心',
+            '别迷失自己',
+            '守住本心，才能走得更远',
+            '你需要有底线',
+            '别突破自己的底线',
+            '底线不可触碰',
+            '你需要有原则',
+            '别没有原则',
+            '原则是做人的根本',
+            '你需要坚守原则',
+            '别妥协',
+            '不该妥协的，绝对不能妥协',
+            '你需要有骨气',
+            '别卑躬屈膝',
+            '人不可有傲气，但不可无傲骨',
+            '你需要有尊严',
+            '别丢掉自己的尊严',
+            '尊严比什么都重要',
+            '你需要尊重自己',
+            '别作践自己',
+            '你值得被尊重',
+            '你需要尊重别人',
+            '别不尊重别人',
+            '尊重别人，就是尊重自己',
+            '你需要学会换位思考',
+            '别自私自利',
+            '多为别人着想一点',
+            '你需要有同理心',
+            '别冷漠',
+            '善良一点，世界会更美好',
+            '你需要保持善良',
+            '别作恶',
+            '善有善报，恶有恶报',
+            '你需要多做善事',
+            '别斤斤计较',
+            '吃亏是福',
+            '你需要大度一点',
+            '别小肚鸡肠',
+            '海纳百川，有容乃大',
+            '你需要学会包容',
+            '别记仇',
+            '冤冤相报何时了',
+            '你需要学会原谅',
+            '别抓住别人的错误不放',
+            '得饶人处且饶人',
+            '你需要宽以待人',
+            '别严以待人，宽以律己',
+            '严于律己，宽以待人',
+            '你需要学会感恩',
+            '别忘恩负义',
+            '滴水之恩，当涌泉相报',
+            '你需要珍惜身边的人',
+            '别失去了才懂得珍惜',
+            '珍惜眼前人',
+            '你需要多陪陪家人',
+            '别忽略了家人',
+            '家人是你最坚强的后盾',
+            '你需要多和朋友联系',
+            '别疏远了朋友',
+            '朋友多了路好走',
+            '你需要珍惜友谊',
+            '别背叛朋友',
+            '友谊地久天长',
+            '你需要真诚待人',
+            '别虚伪',
+            '真诚才是必杀技',
+            '你需要诚实守信',
+            '别撒谎',
+            '人无信不立',
+            '你需要信守承诺',
+            '别言而无信',
+            '一诺千金',
+            '你需要说到做到',
+            '别开空头支票',
+            '言出必行',
+            '你需要有分寸',
+            '别越界',
+            '分寸感很重要',
+            '你需要懂礼貌',
+            '别没礼貌',
+            '礼多人不怪',
+            '你需要学会送礼',
+            '别舍不得花钱',
+            '钱是赚出来的，不是省出来的',
+            '你需要学会理财',
+            '别乱花钱',
+            '你不理财，财不理你',
+            '你需要开源节流',
+            '别月光',
+            '存钱很重要',
+            '你需要有积蓄',
+            '别寅吃卯粮',
+            '手里有粮，心里不慌',
+            '你需要学会投资',
+            '别盲目投资',
+            '投资有风险，入市需谨慎',
+            '你需要谨慎一点',
+            '别冲动',
+            '冲动是魔鬼',
+            '你需要冷静思考',
+            '别头脑发热',
+            '三思而后行',
+            '你需要有远见',
+            '别目光短浅',
+            '放长线，钓大鱼',
+            '你需要有格局',
+            '别格局太小',
+            '格局决定结局',
+            '你需要有胸怀',
+            '别心胸狭窄',
+            '胸怀天下，才能成就大事',
+            '你需要有野心',
+            '别安于现状',
+            '不想当将军的士兵不是好士兵',
+            '你需要有上进心',
+            '别躺平',
+            '努力才会有回报',
+            '你需要勤奋一点',
+            '别懒惰',
+            '勤能补拙',
+            '你需要吃苦',
+            '别怕吃苦',
+            '吃得苦中苦，方为人上人',
+            '你需要有毅力',
+            '别半途而废',
+            '锲而不舍，金石可镂',
+            '你需要有恒心',
+            '别三天打鱼两天晒网',
+            '持之以恒，才能成功',
+            '你需要有自制力',
+            '别放纵自己',
+            '自律才能自由',
+            '你需要自律',
+            '别拖延',
+            '自律的人生才会开挂',
+            '你需要有时间观念',
+            '别迟到',
+            '守时是最基本的礼貌',
+            '你需要有契约精神',
+            '别违约',
+            '契约精神是商业的根本',
+            '你需要有职业道德',
+            '别违背职业道德',
+            '爱岗敬业，才能有所成就',
+            '你需要认真工作',
+            '别摸鱼',
+            '工作是安身立命之本',
+            '你需要努力工作',
+            '别敷衍工作',
+            '你敷衍工作，工作就会敷衍你',
+            '你需要对工作负责',
+            '别推卸工作责任',
+            '责任心是职场的核心竞争力',
+            '你需要和同事搞好关系',
+            '别和同事闹矛盾',
+            '职场人际关系很重要',
+            '你需要和领导搞好关系',
+            '别和领导对着干',
+            '情商比智商更重要',
+            '你需要提升自己的情商',
+            '别说话不过脑子',
+            '会说话，才能走得远',
+            '你需要学会说话',
+            '别口无遮拦',
+            '祸从口出，言多必失',
+            '你需要学会倾听',
+            '别打断别人说话',
+            '倾听是最好的沟通',
+            '你需要学会沟通',
+            '别冷战',
+            '沟通是解决问题的唯一途径',
+            '你需要学会表达',
+            '别把话憋在心里',
+            '表达自己的需求，才会被满足',
+            '你需要学会拒绝',
+            '别不好意思拒绝',
+            '拒绝别人，是你的权利',
+            '你需要学会说不',
+            '别委屈自己',
+            '你的感受最重要',
+            '你需要学会爱自己',
+            '别为了别人委屈自己',
+            '爱自己，才是终身浪漫的开始',
+            '你需要学会放下',
+            '别执念太深',
+            '放下执念，才能获得自由',
+            '你需要学会释怀',
+            '别和自己过不去',
+            '释怀，是对自己最好的温柔',
+            '你需要学会接受',
+            '别抗拒现实',
+            '接受不能改变的，改变能改变的',
+            '你需要学会改变',
+            '别一成不变',
+            '改变，是成长的开始',
+            '你需要学会成长',
+            '别拒绝成长',
+            '成长，是人生的必修课',
+            '你需要学会独处',
+            '别害怕孤独',
+            '独处，是一个人的清欢',
+            '你需要学会享受孤独',
+            '别害怕一个人',
+            '一个人，也可以活得很精彩',
+            '你需要学会坚强',
+            '别轻易流泪',
+            '眼泪解决不了任何问题',
+            '你需要学会微笑',
+            '别愁眉苦脸',
+            '微笑，是最好的解药',
+            '你需要学会乐观',
+            '别悲观厌世',
+            '乐观的人，永远有希望',
+            '你需要学会感恩',
+            '别抱怨',
+            '抱怨，是最没用的东西',
+            '你需要学会知足',
+            '别贪得无厌',
+            '知足常乐，平淡是真',
+            '你需要学会简单',
+            '别把事情复杂化',
+            '简单，才是生活的本质',
+            '你需要学会慢下来',
+            '别太着急',
+            '慢下来，才能感受生活的美好',
+            '你需要学会活在当下',
+            '别活在过去，也别活在未来',
+            '当下，才是你唯一能把握的',
+            '你需要学会珍惜',
+            '别失去了才后悔',
+            '珍惜拥有的，才是最幸福的',
+            '你需要学会放下过去',
+            '别被过去困住',
+            '过去的，就让它过去吧',
+            '你需要学会拥抱未来',
+            '别害怕未来',
+            '未来，充满了无限可能',
+            '你需要相信未来',
+            '别对未来失去信心',
+            '未来可期，人间值得',
+            '你需要相信自己',
+            '别怀疑自己',
+            '你，就是最好的',
+            '你值得世间所有的美好',
+            '别放弃，总会有希望',
+            '天无绝人之路',
+            '柳暗花明又一村',
+            '会有峰回路转的一天',
+            '你需要再坚持一下',
+            '胜利就在眼前',
+            '你会成功的',
+            '你会赢的',
+            '一切都会如你所愿',
+            '你想要的，都会得到',
+            '好运正在向你飞奔而来',
+            '你会迎来属于你的高光时刻',
+            '你的努力，终会有回报',
+            '你的付出，都会被看见',
+            '你会被世界温柔以待',
+            '人间值得，你更值得',
+            '别想了，去做吧',
+            '别等了，现在就行动',
+            '别犹豫，机会就在眼前',
+            '别害怕，你可以的',
+            '别怀疑，你值得',
+            '别放弃，坚持下去',
+            '别回头，向前走',
+            '别内耗，放过自己',
+            '别焦虑，一切都会好的',
+            '别迷茫，答案就在前方',
+            '别难过，会好起来的',
+            '别生气，不值得',
+            '别委屈，你很好',
+            '别自卑，你很棒',
+            '别自负，谦虚一点',
+            '别冲动，冷静一点',
+            '别急躁，耐心一点',
+            '别懒惰，勤奋一点',
+            '别拖延，现在就做',
+            '别撒谎，诚实一点',
+            '别虚伪，真诚一点',
+            '别冷漠，善良一点',
+            '别自私，大方一点',
+            '别小气，大度一点',
+            '别计较，宽容一点',
+            '别记仇，放下一点',
+            '别抱怨，感恩一点',
+            '别悲观，乐观一点',
+            '别消极，积极一点',
+            '别堕落，振作一点',
+            '别躺平，努力一点',
+            '别摆烂，奋斗一点',
+            '别浮躁，沉稳一点',
+            '别张扬，低调一点',
+            '别骄傲，谦虚一点',
+            '别自卑，自信一点',
+            '别软弱，坚强一点',
+            '别脆弱，勇敢一点',
+            '别依赖，独立一点',
+            '别依附，自主一点',
+            '别盲从，有主见一点',
+            '别随波逐流，做自己',
+            '别被别人左右，你的人生你做主',
+            '别为别人而活，为自己而活',
+            '别亏待自己，对自己好一点',
+            '别忽略自己，爱自己多一点',
+            '别忘记自己，你才是最重要的',
+            '别失去自己，做自己就好',
+            '别改变自己，你很好',
+            '别怀疑自己，你很棒',
+            '别否定自己，你值得',
+            '别贬低自己，你很优秀',
+            '别看不起自己，你有无限可能',
+            '别给自己设限，你可以做到',
+            '别害怕失败，大不了从头再来',
+            '别害怕犯错，错了就改',
+            '别害怕未知，未知充满惊喜',
+            '别害怕改变，改变带来成长',
+            '别害怕孤独，孤独是成长的必修课',
+            '别害怕失去，失去的本来就不属于你',
+            '别害怕离别，离别是为了更好的重逢',
+            '别害怕死亡，活着就要好好活',
+            '别害怕，一切都会过去的',
+            '别担心，天塌不下来',
+            '别焦虑，时间会给你答案',
+            '别迷茫，路就在脚下',
+            '别难过，总会有人爱你',
+            '别委屈，总会有人懂你',
+            '别孤单，总会有人陪你',
+            '别绝望，总会有希望',
+            '别放弃，总会有转机',
+            '别停下，总会有出路',
+            '别回头，总会有惊喜',
+            '别害怕，大胆去做吧',
+            '相信自己，你可以的',
+            '相信未来，一切都会好的',
+            '相信缘分，该来的总会来',
+            '相信努力，总会有回报',
+            '相信坚持，总会有结果',
+            '相信善良，总会被温柔以待',
+            '相信真诚，总会被真心相待',
+            '相信美好，总会如期而至',
+            '相信奇迹，总会发生',
+            '相信光，总会照亮黑暗',
+            '相信自己，你就是光',
+            '你就是自己的太阳，无需凭借谁的光',
+            '你若盛开，蝴蝶自来',
+            '你若安好，便是晴天',
+            '你若不伤，岁月无恙',
+            '你若强大，无惧风雨',
+            '你若勇敢，世界都会为你让路',
+            '你若坚持，终会成功',
+            '你若努力，终会发光',
+            '你若热爱，可抵岁月漫长',
+            '你若温柔，世界都会对你温柔',
+            '你若善良，终有福报',
+            '你若真诚，终遇真心',
+            '你若不忘初心，方得始终',
+            '你若不负韶华，未来可期',
+            '你若历尽千帆，终能得偿所愿',
+            '你若遍历山河，仍觉人间值得',
+            '你若一生努力，一生被爱',
+            '你若温暖纯良，不舍爱与自由',
+            '你若眼中有光，心中有爱，目光所及皆是美好',
+            '你若脚下有路，行囊有梦，踏足之处均是坦途',
+            '你若以梦为马，不负韶华，流年笑掷，未来可期'
+        ];
+
+        // 核心工具函数
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // 爱情问题匹配逻辑
+        function isLoveQuestion(question) {
+            const formatQuestion = question.toLowerCase()
+                .replace(/\s+/g, '')
+                .replace(/[\uff00-\uffef]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0));
+            return loveKeywords.some(keyword => 
+                formatQuestion.includes(keyword.toLowerCase().replace(/\s+/g, ''))
+            );
+        }
+
+        // 创建魔法粒子效果
+        function createMagicParticles() {
+            const particlesContainer = document.getElementById('magic-particles');
+            particlesContainer.innerHTML = '';
+            
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 3 + 's';
+                particle.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // 生成星空背景
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 80; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.cssText = `
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    width: ${Math.random() * 2 + 1}px;
+                    height: ${Math.random() * 2 + 1}px;
+                    --duration: ${Math.random() * 3 + 2}s;
+                    animation-delay: ${Math.random() * 2}s;
+                `;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // 核心元素获取
+        const book = document.getElementById('book');
+        const bookCover = document.getElementById('bookCover');
+        const answerDisplay = document.getElementById('answerDisplay');
+        const answerText = document.getElementById('answerText');
+        const answerNumber = document.getElementById('answerNumber');
+        const questionInput = document.getElementById('questionInput');
+        const seekButton = document.getElementById('seekButton');
+        const pageNumberElement = document.getElementById('page-number');
+
+        let isOpen = false;
+        let isAnimating = false;
+        let currentAnswer = '';
+        let pageCount = 0;
+
+        // 打开书籍
+        function openBook(callback) {
+            if (isAnimating || isOpen) return;
+            
+            isAnimating = true;
+            createMagicParticles();
+            
+            bookCover.classList.add('open');
+            book.classList.add('opened');
+            isOpen = true;
+            
+            setTimeout(() => {
+                isAnimating = false;
+                if (callback) callback();
+            }, 1200);
+        }
+
+        // 关闭书籍
+        function closeBook(callback) {
+            if (isAnimating || !isOpen) return;
+            
+            isAnimating = true;
+            
+            bookCover.classList.remove('open');
+            book.classList.remove('opened');
+            isOpen = false;
+            
+            setTimeout(() => {
+                answerDisplay.classList.remove('visible');
+                isAnimating = false;
+                if (callback) callback();
+            }, 500);
+        }
+
+        // 显示答案
+        function showAnswer(answer) {
+            pageCount++;
+            answerDisplay.classList.remove('visible');
+            
+            setTimeout(() => {
+                answerText.textContent = answer;
+                answerNumber.textContent = `第 ${pageCount} 页`;
+                // 生成随机页码
+                const randomPageNumber = Math.floor(Math.random() * 300) + 1;
+                pageNumberElement.textContent = randomPageNumber;
+                answerDisplay.classList.add('visible');
+            }, 300);
+        }
+
+        // 寻求答案
+        function seekAnswer() {
+            const question = questionInput.value.trim();
+            
+            if (!question) {
+                questionInput.focus();
+                questionInput.style.borderColor = '#c9a227';
+                setTimeout(() => {
+                    questionInput.style.borderColor = '';
+                }, 1000);
+                return;
+            }
+            
+            seekButton.disabled = true;
+            
+            if (!isOpen) {
+                openBook(() => {
+                    showThinkingState();
+                });
+            } else {
+                showThinkingState();
+            }
+        }
+
+        // 显示思考状态
+        function showThinkingState() {
+            answerDisplay.classList.add('thinking');
+            answerText.textContent = "寻找答案中...";
+            
+            setTimeout(() => {
+                answerDisplay.classList.remove('thinking');
+                const isLove = isLoveQuestion(questionInput.value.trim());
+                const answer = isLove ? getRandomItem(loveAnswers) : getRandomItem(generalAnswers);
+                currentAnswer = answer;
+                showAnswer(answer);
+                seekButton.disabled = false;
+
+                // 自动关闭书本
+                setTimeout(() => {
+                    closeBook();
+                }, 5000);
+            }, 1500);
+        }
+
+        // 事件监听
+        bookCover.addEventListener('click', () => {
+            if (isAnimating) return;
+            
+            if (isOpen) {
+                closeBook();
+            } else {
+                if (currentAnswer) {
+                    openBook(() => {
+                        showAnswer(currentAnswer);
+                    });
+                }
+            }
+        });
+
+        seekButton.addEventListener('click', seekAnswer);
+
+        questionInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                seekAnswer();
+            }
+        });
+
+        // 初始化
+        createStars();
+        questionInput.focus();
+    </script>
+
+</body></html>
